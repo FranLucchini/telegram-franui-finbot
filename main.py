@@ -10,13 +10,14 @@ from database import Database
 # Read .env file
 
 logging.basicConfig(level=logging.INFO)
-
-# Read bot api token fron .env file
-TOKEN = os.environ.get('TOKEN')
 DB_NAME = 'expenses.db'
 
 
 async def start(update, context):
+    # Build database and tables
+    db = Database(DB_NAME)
+    db.create_table()
+    db.close()
     await update.message.reply_text('Welcome to the expense tracker bot!')
 
 
@@ -59,20 +60,24 @@ def print_expenses(expenses, month=None, year=None):
 
 async def get_expenses(update, context):
     db = Database(DB_NAME)
-    expenses = db.get_expenses()
-    db.close()
+    try:
+        expenses = db.get_expenses()
+        db.close()
 
-    if expenses:
-        reply = print_expenses(expenses)
-        await update.message.reply_text(reply)
-    else:
-        await update.message.reply_text('No expenses found!')
+        if expenses:
+            reply = print_expenses(expenses)
+            await update.message.reply_text(reply)
+        else:
+            await update.message.reply_text('No expenses found!')
+    except Exception as e:
+        await update.message.reply_text(f'Error: {e}')
 
 
 async def get_expenses_by_month(update, context):
     db = Database(DB_NAME)
-    month = int(context.args[0])
-    year = int(context.args[1])
+    month = context.args[0]
+    year = context.args[1]
+    print(month, year, flush=True)
     expenses = db.get_expenses_by_month(month, year)
     db.close()
 
@@ -85,6 +90,12 @@ async def get_expenses_by_month(update, context):
 
 def main():
     load_dotenv()
+    # Read bot api token fron .env file
+    TOKEN = os.environ.get('TOKEN')
+
+    # Print a message that the app is running
+    print('Bot is running...', flush=True)
+
     app = ApplicationBuilder().token(TOKEN).build()
 
     app.add_handler(CommandHandler('start', start))

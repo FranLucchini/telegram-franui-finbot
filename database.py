@@ -44,6 +44,7 @@ class Database:
         return self.cursor.fetchall()
 
     def get_expenses_by_month(self, month, year):
+        print(month, year, flush=True)
         self.cursor.execute(
             '''
             SELECT * FROM expenses
