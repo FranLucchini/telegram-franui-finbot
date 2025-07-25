@@ -8,9 +8,9 @@ from telegram.ext import CommandHandler
 
 from database import Database
 # Read .env file
-
+load_dotenv()
 logging.basicConfig(level=logging.INFO)
-DB_NAME = 'expenses.db'
+DB_NAME = os.environ.get('DB_NAME')
 
 
 async def start(update, context):
