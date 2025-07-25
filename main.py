@@ -60,6 +60,7 @@ def print_expenses(expenses, month=None, year=None):
 
 async def get_expenses(update, context):
     db = Database(DB_NAME)
+    print("Getting all expenses...", flush=True)
     try:
         expenses = db.get_expenses()
         db.close()
