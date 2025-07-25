@@ -11,14 +11,17 @@ from database import Database
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 DB_NAME = os.environ.get('DB_NAME')
+print(DB_NAME, flush=True)
 
-
-async def start(update, context):
+def start():
+    db_dir = os.path.dirname(DB_NAME)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
     # Build database and tables
     db = Database(DB_NAME)
     db.create_table()
     db.close()
-    await update.message.reply_text('Welcome to the expense tracker bot!')
+    # await update.message.reply_text('Welcome to the expense tracker bot!')
 
 
 async def add_expense(update, context):
@@ -99,11 +102,11 @@ def main():
 
     app = ApplicationBuilder().token(TOKEN).build()
 
-    app.add_handler(CommandHandler('start', start))
+    # app.add_handler(CommandHandler('start', start))
     app.add_handler(CommandHandler('add', add_expense))
     app.add_handler(CommandHandler('get', get_expenses))
     app.add_handler(CommandHandler('get_month_year', get_expenses_by_month))
-
+    start()
     app.run_polling()
 
 
